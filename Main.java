@@ -13,12 +13,18 @@ public class Main {
         // create a new Distance Matrix given the Initials of the cities of the given
         // file
 
-        // DistanceMatrix path = new DistanceMatrix(dm, "ADPTUV"); // best solution so  far : [Teixoso, Pinhal, Atroeira, Vilar, Ulgueira, Douro] 459
-                                                                                           // [Douro, Ulgueira, Vilar, Atroeira, Pinhal, Teixoso] 459
+        // DistanceMatrix path = new DistanceMatrix(dm, "ADPTUV"); // best solution so
+        // far : [Teixoso, Pinhal, Atroeira, Vilar, Ulgueira, Douro] 459
+        // [Douro, Ulgueira, Vilar, Atroeira, Pinhal, Teixoso] 459
 
-        DistanceMatrix path = new DistanceMatrix(dm, "CDGILNOQRSTU");
+       // DistanceMatrix path = new DistanceMatrix(dm, "CDGILNOQRSTU"); // The best solution is : [Quebrada, Lourel,
+                                                                      // Teixoso, Cerdeira, Ulgueira, Douro, Infantado,
+                                                                      // Oura, Gonta, Nelas, Serra, Roseiral] ||
+                                                                      // QLTCUDIOGNSR || 1546
         // get the initial temperature, by finding the biggest distance between any two
         // cities of a given DistanceMatrix
+
+        DistanceMatrix path = new DistanceMatrix(dm,"ABCDEFGHIJLMOPQRSTUV");
         float initialTemp = getInitialTemp(path);
 
         // set the SimulatedAnnealing solver
@@ -37,7 +43,8 @@ public class Main {
             if (maxDistance < Collections.max(i))
                 maxDistance = Collections.max(i);
         }
-        return (float) maxDistance;
+
+        return (float) (maxDistance / Math.log(1.01));
 
     }
 }

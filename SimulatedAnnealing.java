@@ -68,9 +68,11 @@ public class SimulatedAnnealing {
         int totalCost = calculateDistance(result);
         System.out.println("The lowest cost is : " + totalCost);
 
-        int returnCost = fullMatrix.distance(result.get(0), result.get(result.size() - 1));
-        System.out.println("The return distance from the goal to the start is : " + returnCost);
-        System.out.println("The total cost is : " + (int) (returnCost + totalCost));
+        // int returnCost = fullMatrix.distance(result.get(0), result.get(result.size()
+        // - 1));
+        // System.out.println("The return distance from the goal to the start is : " +
+        // returnCost);
+        // System.out.println("The total cost is : " + (int) (returnCost + totalCost));
 
     }
 
@@ -85,38 +87,43 @@ public class SimulatedAnnealing {
         int bestSolutionCost = currentSolutionCost;
         int nextSolutionCost;
 
-        
         int totalIterations = 0;
-        int acceptanceCriteria = 0;
+        int nIterationsb4Change = 0;
+        double chance = 0;
+        float stopTemp = initialTemp * 0.05F;
 
-         while (acceptanceCriteria < 550) {
-       // while (currentTemp > 1) {
-            int nIterations = 20;
+        int nIterations = initialSolutionMatrix.getCities().size() * (initialSolutionMatrix.getCities().size() - 1)/ 2;
+        
+        while (!(nIterationsb4Change > nIterations/5 && currentTemp < stopTemp)) {
+           
+           
             for (int iteration = 0; iteration < nIterations; iteration++) {
-                acceptanceCriteria++;
+                nIterationsb4Change++;
                 nextSolution = swap(currentSolution); // get neighbour solution
                 nextSolutionCost = calculateDistance(nextSolution);
+
                 if (nextSolutionCost - currentSolutionCost < 0) {
                     currentSolution = nextSolution; // if the neighbour solution has a lower cost , the algorithm always
                                                     // accepts it
-                    acceptanceCriteria = 0;
+                    nIterationsb4Change = 0;
                     currentSolutionCost = nextSolutionCost;
                     if (currentSolutionCost < bestSolutionCost)
                         bestSolution = currentSolution; // if the current solution has a lower cost than the best
                                                         // solution
                                                         // found so far, update the best solution
                 } else {
-                    double chance = acceptanceProbability(currentTemp, currentSolutionCost, nextSolutionCost);
-                  //  System.out.println(chance);
-                    if (chance > Math.random()) {
+                    chance = acceptanceProbability(currentTemp, (float) (nextSolutionCost - currentSolutionCost));
+                    // if (totalIterations % 100 == 0)
+                    //     System.out.println(chance);
+                    if (Math.random() <= chance) {
                         currentSolution = nextSolution;
-                        acceptanceCriteria = 0;
+                        nIterationsb4Change = 0;
                     }
                 }
                 totalIterations++;
 
             }
-            nIterations *= 1.2;
+            nIterations *= 1.1;
             currentTemp *= decay;
 
         }
@@ -126,9 +133,9 @@ public class SimulatedAnnealing {
 
     // d = d(i,j) + d(i+1,j+1) - d(i,i+1) - d(j,j+1)
     // P(d) = exp(-d/T)
-    private double acceptanceProbability(float currentTemp, int currentSolutionCost, int nextSolutionCost) {
+    private double acceptanceProbability(float currentTemp, float deltaCost) {
 
-        return Math.exp(-( nextSolutionCost - currentSolutionCost ) / currentTemp);
+        return Math.exp(-(deltaCost) / currentTemp);
     }
 
     private ArrayList<String> swap(ArrayList<String> currentSolution) {
@@ -155,14 +162,16 @@ public class SimulatedAnnealing {
     }
 
     private int calculateDistance(ArrayList<String> solution) {
-        DistanceMatrix distanceMatrix = new DistanceMatrix(fullMatrix, solution);
+        // DistanceMatrix distanceMatrix = new DistanceMatrix(fullMatrix, solution);
+
         int totalCost = 0;
 
         // sum of all the distances between the cities
         for (int i = 0; i < solution.size() - 1; i++) {
-            totalCost += distanceMatrix.distance(solution.get(i), solution.get(i + 1));
+            totalCost += fullMatrix.distance(solution.get(i), solution.get(i + 1));
 
         }
+        totalCost += fullMatrix.distance(solution.get(0), solution.get(solution.size() - 1));
 
         return totalCost;
     }
